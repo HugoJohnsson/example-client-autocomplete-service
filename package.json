@@ -1,0 +1,28 @@
+{
+  "name": "example-client-autocomplete-sevice",
+  "version": "1.0.0",
+  "description": "An example client for the autocomplete service / API I built (see here: https://github.com/HugoJohnsson/autocomplete-service)",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack serve",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HugoJohnsson/example-client-autocomplete-sevice.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HugoJohnsson/example-client-autocomplete-sevice/issues"
+  },
+  "homepage": "https://github.com/HugoJohnsson/example-client-autocomplete-sevice#readme",
+  "devDependencies": {
+    "css-loader": "^5.0.1",
+    "style-loader": "^2.0.0",
+    "webpack": "^5.10.0",
+    "webpack-cli": "^4.2.0",
+    "webpack-dev-server": "^3.11.0"
+  }
+}

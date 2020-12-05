@@ -1,0 +1,76 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: sans-serif;
+    color: #333;
+}
+
+.app-container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
+.search {
+    margin-top: 10%;
+    padding: 2rem;
+    width: 560px;
+}
+
+.search__title {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.search__description {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.search__box {
+    box-shadow: 0 1px 6px rgba(32,33,36,.28);
+    border-radius: 25px;
+}
+
+.search__input {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    border: 0.5px solid lightgray;
+    border-radius: 25px;
+    outline: none;
+}
+
+.search__input--autocompleted {
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: 0;
+}
+
+.search__matching_phrases {
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+    border: 0.5px solid lightgray;
+    padding-bottom: 2rem;
+    display: none;
+}
+
+.search__matching_phrases--show {
+    display: block;
+}
+
+.search__matching_phrases_item {
+    padding: 0.9rem;
+    cursor: pointer;
+}
+
+.search__matching_phrases_item:hover {
+    background: #f8f8f8;
+}
