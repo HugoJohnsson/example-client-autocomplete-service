@@ -5,4 +5,4 @@ An example client for the autocomplete service / API I built (see here: https://
 
 I've used webpack to setup a simple development environment with TypeScript.
 Project includes an autocompleted search box with associated code located in a
-reusable class called "SearchBox".
+reusable class called "AutoCompletedSearchBox".
