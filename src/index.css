@@ -70,7 +70,3 @@ body {
     padding: 0.9rem;
     cursor: pointer;
 }
-
-.search__matching_phrases_item:hover {
-    background: #f8f8f8;
-}

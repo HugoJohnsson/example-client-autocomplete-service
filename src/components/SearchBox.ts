@@ -3,33 +3,83 @@
     function.
 */
 
-const apiUrl = 'http://localhost:5000';
-const getMatchingPhrasesEndpoint = '/api/v1/match/' // + prefix
+const getMatchingPhrasesUrl = (prefix: string) => 'http://localhost:5000/api/v1/match/' + prefix; 
 
 class SearchBox {
 
-    _inputEl: HTMLInputElement;
-    _matchingPhrasesEl: HTMLDivElement;
+    _el: HTMLElement; // The root search box element
+    _inputEl: HTMLElement;
+    _matchingPhrasesEl: HTMLElement;
 
-    constructor() {
-        this._inputEl = document.querySelector('.search__input');
-        this._matchingPhrasesEl = document.querySelector('.search__matching_phrases');
+    _matchingPhrases: Array<string>; // Holds all current matching phrases
+    _selectedPhraseIndex = 0; // Holds the index of the matching phrase currently selected in this._matchingPhrases
+
+    /*
+        Has the user start to look through the matching phrases with the arrow keys?
+        Is used to determine the index of the the phrase element to "focus" on
+    */
+    _haveUserPressedArrows = false;
+
+    constructor(el: HTMLElement) {
+        this._el = el;
+        this._inputEl = el.querySelector('#search-input');
+        this._matchingPhrasesEl = el.querySelector('#matching-phrases');
 
         this._inputEl.focus();
 
+        this._el.addEventListener('mouseout', () => {
+            this.resetSelectedPhrase();
+        })
+
         // Event listeners
-        this._inputEl.addEventListener('input', this.handleInputEvent);
+        this._inputEl.addEventListener('input', this.handleSearchInputEvent);
+        document.onkeydown = (e) => {
+            if (e.key == 'ArrowUp') {
+                this.updateSelectedPhraseIndex('decrement');
+                this.setSelectedMatchingPhrase(this._matchingPhrases[this._selectedPhraseIndex]);
+            }
+            else if (e.key == 'ArrowDown') {
+                if (this._haveUserPressedArrows) {
+                    this.updateSelectedPhraseIndex('increment');
+                } else {
+                    this._haveUserPressedArrows = true;
+                }
+                
+                this.setSelectedMatchingPhrase(this._matchingPhrases[this._selectedPhraseIndex]);
+            }
+        }
     }
 
-    handleInputEvent = async (e: any) => {
-        const value = e.target.value;
+    updateSelectedPhraseIndex = (action: 'increment' | 'decrement') => {
+        switch (action) {
+            case 'increment':
+                this._selectedPhraseIndex += 1;
 
-        if (value.length > 0) {
-            const response = await fetch(apiUrl + getMatchingPhrasesEndpoint + value);
-            const phrases = await response.json();
+                if (this._selectedPhraseIndex > this._matchingPhrases.length - 1) {
+                    this._selectedPhraseIndex = this._matchingPhrases.length - 1;
+                }
+                break;
+            case 'decrement':
+                this._selectedPhraseIndex -= 1;
+
+                if (this._selectedPhraseIndex < 0) {
+                    this._selectedPhraseIndex = 0;
+                }
+                break;
+        }
+    }
+
+    handleSearchInputEvent = async (e: any) => {
+        const searchInputValue = e.target.value;
+
+        if (searchInputValue.length > 0) {
+            let phrases = await fetch(getMatchingPhrasesUrl(searchInputValue)).then(response => response.json());
+            phrases = phrases.slice(0, 6);
+
+            this._matchingPhrases = phrases;
 
             if (phrases.length > 0) {
-                this.displayMatchingPhrases(phrases.slice(0, 6));
+                this.displayMatchingPhrases(phrases);
             } else {
                 this._matchingPhrasesEl.innerHTML = "";
                 this.hideAutoCompleteElements();
@@ -47,12 +97,43 @@ class SearchBox {
         this.showAutoCompleteElements();
     
         phrases.forEach((phrase: string) => {
-            let el = document.createElement('div');
-            el.classList.add('search__matching_phrases_item');
-            el.textContent = phrase;
+            const el = this.makeMatchingPhraseElement(phrase);
     
             this._matchingPhrasesEl.append(el);
         });
+    }
+
+    makeMatchingPhraseElement = (phrase: string) => {
+        let el = document.createElement('div');
+        el.classList.add('search__matching_phrases_item');
+        el.textContent = phrase;
+
+        el.addEventListener('mouseover', (e: any) => {
+            this._selectedPhraseIndex = this._matchingPhrases.indexOf(phrase);
+            this.setSelectedMatchingPhrase(e.target.textContent);
+        });
+
+        return el;
+    }
+
+    setSelectedMatchingPhrase = (phrase: string) => {
+        this.getAllMatchingPhrasesElements().forEach((phraseEl: HTMLElement) => {
+            if (phraseEl.textContent == phrase) {
+                phraseEl.style.background = '#f1f1f1';
+            } else {
+                phraseEl.style.background = '';
+            }
+        });
+    }
+    
+    resetSelectedPhrase = () => {
+        this.getAllMatchingPhrasesElements().forEach((phraseEl: HTMLElement) => {
+            phraseEl.style.background = '';
+        });
+    }
+
+    getAllMatchingPhrasesElements = () => {
+        return document.querySelectorAll('.search__matching_phrases_item');
     }
     
     showAutoCompleteElements = () => {

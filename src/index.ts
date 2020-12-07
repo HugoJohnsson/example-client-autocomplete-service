@@ -1,5 +1,5 @@
 import './index.css';
 import SearchBox from './components/SearchBox';
 
-// Setup search box
-new SearchBox();
+// Setup the search box component
+new SearchBox(document.getElementById('search-box'));
