@@ -56,10 +56,20 @@ class SearchBox {
                 this.setSelectedMatchingPhrase(this._matchingPhrases[this._selectedPhraseIndex]);
             }
             else if(e.key == 'Enter') {
-                this._onSubmit(this._inputEl.value);
-                this.reset();
+                if (this._haveUserPressedArrows) { // Search for the currently selected phrase
+                    this.submit(this._matchingPhrases[this._selectedPhraseIndex]);
+                } else {
+                    this.submit();
+                }
             }
         }
+    }
+
+    submit = (value?: string) => {
+        if (value) this._onSubmit(value);
+        else this._onSubmit(this._inputEl.value);
+
+        this.reset();
     }
 
     updateSelectedPhraseIndex = (action: 'increment' | 'decrement') => {
@@ -82,6 +92,7 @@ class SearchBox {
     }
 
     handleSearchInputEvent = async (e: any) => {
+        this.resetSelectedPhrase(); // Reset the selected phrase everytime something new is typed in to the input field
         const searchInputValue = e.target.value;
 
         if (searchInputValue.length > 0) {
@@ -125,6 +136,10 @@ class SearchBox {
             this.setSelectedMatchingPhrase(e.target.textContent);
         });
 
+        el.addEventListener('click', (e: any) => {
+            this.submit(e.target.textContent);
+        });
+
         return el;
     }
 
@@ -139,6 +154,9 @@ class SearchBox {
     }
     
     resetSelectedPhrase = () => {
+        this._haveUserPressedArrows = false;
+        this._selectedPhraseIndex = 0;
+
         this.getAllMatchingPhrasesElements().forEach((phraseEl: HTMLElement) => {
             phraseEl.style.background = '';
         });
