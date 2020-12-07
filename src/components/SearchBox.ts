@@ -3,35 +3,43 @@
     function.
 */
 
-const getMatchingPhrasesUrl = (prefix: string) => 'http://localhost:5000/api/v1/match/' + prefix; 
+const getMatchingPhrasesUrl = (prefix: string) => 'http://localhost:5000/api/v1/match/' + prefix;
+
+type OnSubmitFunction = (query: string) => any;
 
 class SearchBox {
 
     _el: HTMLElement; // The root search box element
-    _inputEl: HTMLElement;
+    _inputEl: HTMLInputElement;
     _matchingPhrasesEl: HTMLElement;
 
     _matchingPhrases: Array<string>; // Holds all current matching phrases
     _selectedPhraseIndex = 0; // Holds the index of the matching phrase currently selected in this._matchingPhrases
-
     /*
         Has the user start to look through the matching phrases with the arrow keys?
         Is used to determine the index of the the phrase element to "focus" on
     */
     _haveUserPressedArrows = false;
+    
+    _onSubmit: OnSubmitFunction; // This function is called when the presses the enter button, is passed in via the constructor
 
-    constructor(el: HTMLElement) {
+    constructor(el: HTMLElement, onSubmit: OnSubmitFunction) {
         this._el = el;
+        this._onSubmit = onSubmit;
+
         this._inputEl = el.querySelector('#search-input');
+        if (!this._inputEl) throw Error(`Couldn't find an element with the id: search-input, this must exists for the search box to function.`);
+
         this._matchingPhrasesEl = el.querySelector('#matching-phrases');
+        if (!this._inputEl) throw Error(`Couldn't find an element with the id: matching-phrases, this must exists for the search box to function.`);
 
         this._inputEl.focus();
 
+        // Event listeners
         this._el.addEventListener('mouseout', () => {
             this.resetSelectedPhrase();
-        })
+        });
 
-        // Event listeners
         this._inputEl.addEventListener('input', this.handleSearchInputEvent);
         document.onkeydown = (e) => {
             if (e.key == 'ArrowUp') {
@@ -46,6 +54,10 @@ class SearchBox {
                 }
                 
                 this.setSelectedMatchingPhrase(this._matchingPhrases[this._selectedPhraseIndex]);
+            }
+            else if(e.key == 'Enter') {
+                this._onSubmit(this._inputEl.value);
+                this.reset();
             }
         }
     }
@@ -138,16 +150,19 @@ class SearchBox {
     
     showAutoCompleteElements = () => {
         this._inputEl.classList.add('search__input--autocompleted');
-    
-        this._matchingPhrasesEl.classList.add('search__matching_phrases--show');
-        this._matchingPhrasesEl.classList.add('search__matching_phrases--autocompleted');
+        this._matchingPhrasesEl.classList.add('search__matching_phrases--show', 'search__matching_phrases--autocompleted');
     }
     
     hideAutoCompleteElements = () => {
         this._inputEl.classList.remove('search__input--autocompleted');
-    
-        this._matchingPhrasesEl.classList.remove('search__matching_phrases--show');
-        this._matchingPhrasesEl.classList.remove('search__matching_phrases--autocompleted');
+        this._matchingPhrasesEl.classList.remove('search__matching_phrases--show', 'search__matching_phrases--autocompleted');
+    }
+
+    reset = () => {
+        this._inputEl.value = "";
+        this.resetSelectedPhrase();
+        this.hideAutoCompleteElements();
+        this._matchingPhrases = [];
     }
 
 }
