@@ -7,11 +7,11 @@ const getMatchingPhrasesUrl = (prefix: string) => 'http://localhost:5000/api/v1/
 
 type OnSubmitFunction = (query: string) => any;
 
-class SearchBox {
+class AutoCompletedSearchBox {
 
     _el: HTMLElement; // The root search box element
     _inputEl: HTMLInputElement;
-    _matchingPhrasesEl: HTMLElement;
+    _matchingPhrasesEl: HTMLElement; // The element that holds all matching phrases
 
     _matchingPhrases: Array<string>; // Holds all current matching phrases
     _selectedPhraseIndex = 0; // Holds the index of the matching phrase currently selected in this._matchingPhrases
@@ -23,6 +23,11 @@ class SearchBox {
     
     _onSubmit: OnSubmitFunction; // This function is called when the presses the enter button, is passed in via the constructor
 
+    // SearchBox constructor
+    /**
+     * @param {[HTMLElement]} el [The root search box element]
+     * @param {[OnSubmitFunction]} onSubmit [Is called when the user submits the form, should be a function which takes a string value (the search query)]
+     */
     constructor(el: HTMLElement, onSubmit: OnSubmitFunction) {
         this._el = el;
         this._onSubmit = onSubmit;
@@ -65,14 +70,14 @@ class SearchBox {
         }
     }
 
-    submit = (value?: string) => {
+    private submit = (value?: string) => {
         if (value) this._onSubmit(value);
         else this._onSubmit(this._inputEl.value);
 
         this.reset();
     }
 
-    updateSelectedPhraseIndex = (action: 'increment' | 'decrement') => {
+    private updateSelectedPhraseIndex = (action: 'increment' | 'decrement') => {
         switch (action) {
             case 'increment':
                 this._selectedPhraseIndex += 1;
@@ -91,7 +96,7 @@ class SearchBox {
         }
     }
 
-    handleSearchInputEvent = async (e: any) => {
+    private handleSearchInputEvent = async (e: any) => {
         this.resetSelectedPhrase(); // Reset the selected phrase everytime something new is typed in to the input field
         const searchInputValue = e.target.value;
 
@@ -113,7 +118,7 @@ class SearchBox {
         }
     }
 
-    displayMatchingPhrases = (phrases: [string]) => {
+    private displayMatchingPhrases = (phrases: [string]) => {
         // Remove current results
         this._matchingPhrasesEl.innerHTML = "";
     
@@ -126,7 +131,7 @@ class SearchBox {
         });
     }
 
-    makeMatchingPhraseElement = (phrase: string) => {
+    private makeMatchingPhraseElement = (phrase: string) => {
         let el = document.createElement('div');
         el.classList.add('search__matching_phrases_item');
         el.textContent = phrase;
@@ -143,7 +148,7 @@ class SearchBox {
         return el;
     }
 
-    setSelectedMatchingPhrase = (phrase: string) => {
+    private setSelectedMatchingPhrase = (phrase: string) => {
         this.getAllMatchingPhrasesElements().forEach((phraseEl: HTMLElement) => {
             if (phraseEl.textContent == phrase) {
                 phraseEl.style.background = '#f1f1f1';
@@ -153,7 +158,7 @@ class SearchBox {
         });
     }
     
-    resetSelectedPhrase = () => {
+    private resetSelectedPhrase = () => {
         this._haveUserPressedArrows = false;
         this._selectedPhraseIndex = 0;
 
@@ -162,21 +167,21 @@ class SearchBox {
         });
     }
 
-    getAllMatchingPhrasesElements = () => {
+    private getAllMatchingPhrasesElements = () => {
         return document.querySelectorAll('.search__matching_phrases_item');
     }
     
-    showAutoCompleteElements = () => {
+    private showAutoCompleteElements = () => {
         this._inputEl.classList.add('search__input--autocompleted');
         this._matchingPhrasesEl.classList.add('search__matching_phrases--show', 'search__matching_phrases--autocompleted');
     }
     
-    hideAutoCompleteElements = () => {
+    private hideAutoCompleteElements = () => {
         this._inputEl.classList.remove('search__input--autocompleted');
         this._matchingPhrasesEl.classList.remove('search__matching_phrases--show', 'search__matching_phrases--autocompleted');
     }
 
-    reset = () => {
+    private reset = () => {
         this._inputEl.value = "";
         this.resetSelectedPhrase();
         this.hideAutoCompleteElements();
@@ -186,4 +191,4 @@ class SearchBox {
 }
 
 
-export default SearchBox;
+export default AutoCompletedSearchBox;
