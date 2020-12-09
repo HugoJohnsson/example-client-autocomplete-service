@@ -36,7 +36,7 @@ class AutoCompletedSearchBox {
         if (!this._inputEl) throw Error(`Couldn't find an element with the id: search-input, this must exists for the search box to function.`);
 
         this._matchingPhrasesEl = el.querySelector('#matching-phrases');
-        if (!this._inputEl) throw Error(`Couldn't find an element with the id: matching-phrases, this must exists for the search box to function.`);
+        if (!this._matchingPhrasesEl) throw Error(`Couldn't find an element with the id: matching-phrases, this must exists for the search box to function.`);
 
         this._inputEl.focus();
 
